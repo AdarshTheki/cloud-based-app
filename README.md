@@ -13,8 +13,8 @@
 
 1. Clone the repository & Install dependencies:
     ```bash
-    git clone https://github.com/AdarshTheki/stackoverflow-appwrite.git
-    cd stackoverflow-appwrite
+    git clone https://github.com/AdarshTheki/cloud-based-app.git
+    cd cloud-based-app
     npm install
     ```
 2. Set up environment variables: Create a `.env.local` file in the root directory and add the following variables:
