@@ -3,7 +3,7 @@ interface Video {
     title: string;
     description: string;
     publicId: string;
-    originalSize: number;
+    originSize: number;
     compressedSize: number;
     duration: number;
     createdAt: Date;

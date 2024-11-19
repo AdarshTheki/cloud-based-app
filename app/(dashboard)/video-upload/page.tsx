@@ -28,17 +28,60 @@ const VideoUploadPage = () => {
         formData.append('originalSize', file.size.toString());
 
         try {
-            const result = await axios.post('/api/video-upload', formData);
+            await axios.post('/api/video-upload', formData);
+            // check for 200 response
+            router.push('/');
         } catch (error) {
             console.log(error);
+            alert('video not uploaded properly!');
+            // notification for failure
         } finally {
             setIsUploading(false);
         }
     };
 
     return (
-        <div>
-            <h2>Video Upload Page</h2>
+        <div className='container mx-auto p-4'>
+            <h1 className='text-2xl font-bold mb-4'>Upload Video</h1>
+            <form onSubmit={handleSubmit} className='space-y-4'>
+                <div>
+                    <label className='label'>
+                        <span className='label-text'>Title</span>
+                    </label>
+                    <input
+                        type='text'
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className='input input-bordered w-full'
+                        required
+                    />
+                </div>
+                <div>
+                    <label className='label'>
+                        <span className='label-text'>Description</span>
+                    </label>
+                    <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className='textarea textarea-bordered w-full'
+                    />
+                </div>
+                <div>
+                    <label className='label'>
+                        <span className='label-text'>Video File</span>
+                    </label>
+                    <input
+                        type='file'
+                        accept='video/*'
+                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        className='file-input file-input-bordered w-full'
+                        required
+                    />
+                </div>
+                <button type='submit' className='btn btn-primary' disabled={isUploading}>
+                    {isUploading ? 'Uploading...' : 'Upload Video'}
+                </button>
+            </form>
         </div>
     );
 };
