@@ -11,7 +11,7 @@ export async function GET() {
         if (!videos.length || videos.length === 0) {
             return NextResponse.json({ message: 'videos not found' }, { status: 404 });
         }
-        return NextResponse.json(videos);
+        return NextResponse.json(videos, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: 'Error fetching videos', error }, { status: 500 });
     } finally {
