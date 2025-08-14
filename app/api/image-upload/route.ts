@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 // import { auth } from '@clerk/nextjs/server';
 
 // Configuration
@@ -37,13 +37,17 @@ export async function POST(req: NextRequest) {
     // Convert the ArrayBuffer into a Node.js Buffer
     const buffer = Buffer.from(bytes);
 
-    const result: CloudinaryUploadResult = await new Promise(
+    const result: UploadApiResponse = await new Promise(
       (resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           { folder: 'cloud-based-images' },
           (err, data) => {
             if (err) reject(err);
-            resolve(data as CloudinaryUploadResult);
+            if (data) {
+              resolve(data);
+            } else {
+              reject(new Error('Upload failed, no data returned'));
+            }
           }
         );
         // End the stream with the file buffer
@@ -53,7 +57,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });
   } catch (error) {
     console.log('UPload image failed', error);
-    return NextResponse.json({ error: 'Upload image failed' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Upload image failed';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

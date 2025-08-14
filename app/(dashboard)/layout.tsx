@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang='en' cz-shortcut-listen='true' data-theme='dark'>
+      <html lang='en' data-theme='dark'>
         <body>
           <Header />
           <div className='min-h-screen flex items-center justify-center'>{children}</div>

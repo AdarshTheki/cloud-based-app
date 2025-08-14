@@ -11,26 +11,40 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+interface CloudinaryResource {
+  public_id: string;
+  secure_url: string;
+  url: string;
+  format: string;
+  width: number;
+  height: number;
+  bytes: number;
+  created_at: string;
+}
+
+interface ResourcesApiResponse {
+  resources: CloudinaryResource[];
+  next_cursor?: string;
+}
+
 export async function GET() {
   try {
     const videos = await prisma.video.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
-    const images = await new Promise<CloudinaryUploadResult[]>(
-      (resolve, reject) => {
-        cloudinary.api.resources(
-          {
-            type: 'upload',
-            prefix: 'cloud-based-images', // Specify the folder name
-          },
-          (err, result) => {
-            if (err) reject(err); // Reject the promise on error
-            resolve(result.resources as CloudinaryUploadResult[]); // Resolve with the resources array
-          }
-        );
-      }
-    );
+    const images = await new Promise<ResourcesApiResponse>((resolve, reject) => {
+      cloudinary.api.resources(
+        {
+          type: 'upload',
+          prefix: 'cloud-based-images', // Specify the folder name
+        },
+        (err, result) => {
+          if (err) reject(err); // Reject the promise on error
+          resolve(result as ResourcesApiResponse); // Resolve with the resources array
+        }
+      );
+    });
 
     return NextResponse.json({ videos: videos || [], images }, { status: 200 });
   } catch (error) {
