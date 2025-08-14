@@ -16,10 +16,11 @@ const HomePage = () => {
       const response = await axios.get('/api/gallery');
       if (
         Array.isArray(response.data.videos) &&
-        Array.isArray(response.data.images)
+        response.data.images &&
+        Array.isArray(response.data.images.resources)
       ) {
         setVideos(response.data.videos);
-        setImages(response.data.images);
+        setImages(response.data.images.resources);
       } else {
         throw new Error(' Unexpected response format');
       }

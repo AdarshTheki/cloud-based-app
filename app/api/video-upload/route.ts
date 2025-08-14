@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { PrismaClient } from '@prisma/client';
 // import { auth } from '@clerk/nextjs/server';
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     // Convert the ArrayBuffer into a Node.js Buffer
     const buffer = Buffer.from(bytes);
 
-    const result = await new Promise<CloudinaryUploadResult>(
+    const result: UploadApiResponse = await new Promise(
       (resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
@@ -52,7 +52,11 @@ export async function POST(req: NextRequest) {
           },
           (err, data) => {
             if (err) reject(err);
-            resolve(data as CloudinaryUploadResult);
+            if (data) {
+              resolve(data);
+            } else {
+              reject(new Error('Upload failed, no data returned'));
+            }
           }
         );
         uploadStream.end(buffer);
@@ -73,8 +77,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(video, { status: 200 });
   } catch (error) {
     console.log('UPload video failed', error);
+    const message = error instanceof Error ? error.message : 'Upload video failed';
     return NextResponse.json(
-      { message: 'UPload video failed' },
+      { message },
       { status: 500 }
     );
   } finally {

@@ -12,8 +12,10 @@ interface Video {
 
 interface CloudinaryUploadResult {
     public_id: string;
+    asset_id: string;
     bytes: number;
     duration?: number;
+    created_at: string;
     [key: string]: any;
 }
 

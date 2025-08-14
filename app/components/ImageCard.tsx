@@ -4,11 +4,10 @@ import dayjs from 'dayjs';
 import { filesize } from 'filesize';
 import { Download } from 'lucide-react';
 import { getCldImageUrl } from 'next-cloudinary';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
+import Image from 'next/image';
 
 const ImageCard: React.FC<CloudinaryUploadResult> = ({ ...rest }) => {
-  const imageRef = useRef<HTMLImageElement>(null);
-
   const getThumbnailUrl = useCallback((publicId: string) => {
     return getCldImageUrl({
       src: publicId,
@@ -26,10 +25,8 @@ const ImageCard: React.FC<CloudinaryUploadResult> = ({ ...rest }) => {
   }, []);
 
   const handleDownload = () => {
-    if (!imageRef.current) return;
-
-    // download image on current page
-    fetch(imageRef.current.src)
+    const imageUrl = getThumbnailUrl(rest.public_id);
+    fetch(imageUrl)
       .then((response) => response.blob())
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -40,31 +37,29 @@ const ImageCard: React.FC<CloudinaryUploadResult> = ({ ...rest }) => {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        document.body.removeChild(link);
       });
   };
 
   return (
-    <div className="card bg-neutral-800 shadow-xl hover:shadow-2xl transition-all duration-300">
+    <div className='card bg-neutral-800 shadow-xl hover:shadow-2xl transition-all duration-300'>
       <figure>
-        <img
+        <Image
           src={getThumbnailUrl(rest.public_id)}
-          alt={rest.asset_id}
-          ref={imageRef}
+          alt={rest.public_id}
+          width={400}
+          height={225}
         />
       </figure>
-      <div className="card-body p-4">
-        <p className="text-sm text-base-content opacity-70 mb-4">
-          Uploaded {dayjs(rest.createdAt).fromNow()}
+      <div className='card-body p-4'>
+        <p className='text-sm text-base-content opacity-70 mb-4'>
+          Uploaded {dayjs(rest.created_at).fromNow()}
         </p>
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm font-semibold">
+        <div className='flex justify-between items-center mt-4'>
+          <div className='text-sm font-semibold'>
             Image size:
-            <span className="text-accent">
-              {formatSize(Number(rest.bytes))}
-            </span>
+            <span className='text-accent'>{formatSize(Number(rest.bytes))}</span>
           </div>
-          <button className="btn btn-primary btn-sm" onClick={handleDownload}>
+          <button className='btn btn-primary btn-sm' onClick={handleDownload}>
             <Download size={16} />
           </button>
         </div>
